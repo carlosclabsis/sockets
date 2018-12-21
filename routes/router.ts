@@ -4,24 +4,33 @@ import  Server  from '../classes/server';
 
 export var router = Router();
 
-// router.get('/mensajes',(req:Request,res:Response)=>{
-//     res.status(200).send(
-//         {
-//             ok:true,
-//             mensaje: "Mensaje correcto"
-//         });
+router.get('/mensajes',(req:Request,res:Response)=>{
+    res.status(200).send(
+        {
+            ok:true,
+            mensaje: "Mensaje correcto"
+        });
 
         
-// });
+});
 
 router.post('/mensajes',(req:Request,res:Response)=>{
     var entrada = req.body.entrada;
+    var de = req.body.de;
+
+    const payload = {
+        de: de,
+        entrada: entrada
+    }
+
+    const server = Server.instance;
+    server.io.emit('mensaje-servidor',payload);
 
     res.status(200).send(
         {
             ok:true,
             mensaje: "Mensaje correcto",
-            entrada: entrada
+            entrada: entrada,
         });
 });
 router.post('/mensajes/:id',(req:Request,res:Response)=>{
@@ -30,38 +39,38 @@ router.post('/mensajes/:id',(req:Request,res:Response)=>{
     var id = req.params.id;
 
     const payload = {
-        de: de,
-        entrada: entrada
+        de,
+        cuerpo: entrada
     }
 
     const server = Server.instance;
-    server.io.in(id).emit('mensaje-privado',payload),
+    server.io.in(id).emit('mensaje-privado',payload);
 
     res.status(200).send(
         {
             ok:true,
             mensaje: "Mensaje correcto",
             entrada: entrada,
-            id,
+            id:id
         });
 });
 
-router.post('/mensajes',(req:Request,res:Response)=>{
-    var entrada = req.body.entrada;
-    var de = req.body.de;
-
-    const payload = {
-        de: de,
-        entrada: entrada
-    }
-
+router.get('/usuarios',(req:Request,res:Response)=>{
     const server = Server.instance;
-    server.io.emit('mensaje-servidor',payload),
-
-    res.status(200).send(
-        {
-            ok:true,
-            mensaje: "Mensaje correcto",
-            entrada: entrada,
-        });
+    //clients => retorna el arreglo de sockets conectados
+    // []string
+    server.io.clients((err:any,clientes:string[])=>{
+        if(err){
+            return res.status(505).send({
+                ok:false,
+                err
+            });
+        }else{
+            return res.status(200).send({
+                ok:true,
+                clientes
+            });
+        }
+    });
 });
+

@@ -12,7 +12,14 @@ export class UsuariosLista{
         console.log("[UsarioLista|agregar] Nueva lista de Usuarios=>",this.lista);
     }
     public getLista(){
-        return this.lista;
+        // filter => filtramos la lista de usuarios que tengan nombre
+        // filter => solo retorna a la lista si ees que cumple la condicion
+        let listaTemporal = this.lista.filter((usuario)=>{
+            if(usuario.nombre !== 'sin-nombre'){
+                return usuario;
+            }
+        });
+        return listaTemporal;
     }
     public actualizarNombre(id:string, nombre:string){
         for(let usuario of this.lista){
